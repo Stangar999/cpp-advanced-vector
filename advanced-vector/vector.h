@@ -129,16 +129,11 @@ public:
                 Vector copy(other);
                 Swap(copy);
             } else {
+                std::copy(other.begin(), std::min(other.begin() + size_, other.end()), begin());
                 if (size_ >= other.size_) {
-                    for(size_t i = 0; i < other.size_; ++i) {
-                        data_[i] = other[i];
-                    }
                     std::destroy_n((data_.GetAddress() + other.size_), (size_ - other.size_));
                     size_ = other.size_;
                 } else {
-                    for(size_t i = 0; i < size_; ++i) {
-                        data_[i] = other[i];
-                    }
                     std::uninitialized_copy_n((other.data_.GetAddress() + size_)
                                               ,(other.size_- size_)
                                               ,(data_.GetAddress() + size_));
@@ -198,7 +193,9 @@ public:
     }
 
     void PopBack() noexcept {
-        std::destroy_n((data_.GetAddress() + (--size_)), 1);
+        if(size_ > 0) {
+            std::destroy_n((data_.GetAddress() + (--size_)), 1);
+        }
     }
 
     void Reserve(size_t new_capacity) {
